@@ -31,6 +31,13 @@ Place, Fifth Floor, Boston, MA  02110 - 1301  USA
 #include "lodepng.h"
 #include "shaderprogram.h"
 
+float far = -10.0;
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	far += yoffset;
+}
+
 float speed = 0;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -87,16 +94,28 @@ void drawScene(GLFWwindow* window, float angle) {
 	glm::mat4 M = glm::mat4(1.0f);
 	M = rotate(M, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 V = glm::lookAt(
-		glm::vec3(0.0f, 0.0f, -5.0f),
+		glm::vec3(0.0f, 0.0f, far),
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.f, 1.0f, 1.0f, 50.0f);
 	spLambert->use();
-	glUniform4f(spLambert->u("color"), 0.4, 0.6, 0.9, 0.5);
+	glUniform4f(spLambert->u("color"), 0.9, 0.6, 0.0, 1.0);
 	glUniformMatrix4fv(spLambert->u("P"), 1, false, glm::value_ptr(P));
 	glUniformMatrix4fv(spLambert->u("V"), 1, false, glm::value_ptr(V));
 	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
-	Models::torus.drawSolid();
+	Models::sphere.drawSolid();
+	M = glm::scale(M, glm::vec3(0.3f, 0.3f, 0.3f));
+	M = glm::translate(M, glm::vec3(12.0f, 0.0f, 0.0f));
+	M = rotate(M, 3 * angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniform4f(spLambert->u("color"), 0.2, 0.5, 0.6, 1.0);
+	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
+	Models::sphere.drawSolid();
+	M = glm::scale(M, glm::vec3(0.5f, 0.5f, 0.5f));
+	M = glm::translate(M, glm::vec3(4.0f, 0.0f, 0.0f));
+	M = rotate(M, angle, glm::vec3(0.0f, 5.0f, 0.0f));
+	glUniform4f(spLambert->u("color"), 1.0, 1.0, 1.0, 0.0);
+	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
+	Models::sphere.drawSolid();
 	glfwSwapBuffers(window);
 }
 
@@ -135,6 +154,7 @@ int main(void)
 	//float speed = PI;
 	glfwSetTime(0);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 	//Główna pętla
 	while (!glfwWindowShouldClose(window)) //Tak długo jak okno nie powinno zostać zamknięte
 	{
