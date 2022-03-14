@@ -92,7 +92,6 @@ void drawScene(GLFWwindow* window, float angle) {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glm::mat4 M = glm::mat4(1.0f);
-	M = rotate(M, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 V = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, far),
 		glm::vec3(0.0f, 0.0f, 0.0f),
@@ -104,6 +103,14 @@ void drawScene(GLFWwindow* window, float angle) {
 	glUniformMatrix4fv(spLambert->u("V"), 1, false, glm::value_ptr(V));
 	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
 	Models::sphere.drawSolid();
+	glm::mat4 M2 = glm::mat4(1.0f);
+	M2 = glm::scale(M2, glm::vec3(0.6f, 0.6f, 0.6f));
+	M2 = rotate(M2, angle * 0.45f, glm::vec3(0.0f, 0.6f, 0.7f));
+	M2 = glm::translate(M2, glm::vec3(8.0f, 0.0f, 0.0f));
+	glUniform4f(spLambert->u("color"), 0.3, 0.2, 0.8, 1.0);
+	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M2));
+	Models::sphere.drawSolid();
+	M = rotate(M, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 	M = glm::scale(M, glm::vec3(0.3f, 0.3f, 0.3f));
 	M = glm::translate(M, glm::vec3(12.0f, 0.0f, 0.0f));
 	M = rotate(M, 3 * angle, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -112,7 +119,6 @@ void drawScene(GLFWwindow* window, float angle) {
 	Models::sphere.drawSolid();
 	M = glm::scale(M, glm::vec3(0.5f, 0.5f, 0.5f));
 	M = glm::translate(M, glm::vec3(4.0f, 0.0f, 0.0f));
-	M = rotate(M, angle, glm::vec3(0.0f, 5.0f, 0.0f));
 	glUniform4f(spLambert->u("color"), 1.0, 1.0, 1.0, 0.0);
 	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M));
 	Models::sphere.drawSolid();
