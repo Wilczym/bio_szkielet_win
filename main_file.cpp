@@ -101,12 +101,11 @@ void drawScene(GLFWwindow* window, float angle) {
 	glUniform4f(spLambert->u("color"), 0.9, 0.6, 0.0, 1.0);
 	glUniformMatrix4fv(spLambert->u("P"), 1, false, glm::value_ptr(P));
 	glUniformMatrix4fv(spLambert->u("V"), 1, false, glm::value_ptr(V));
-	glm::mat4 M1 = glm::translate(M, glm::vec3(1.1f, 1.0f, 0.0f));
-	M1 = rotate(M1, PI / 3 * 2, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 M1 = M;
 	int direction = 1;
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		glm::mat4 M2 = rotate(M1, angle*direction, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 M2 = rotate(M1, angle * direction, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M2));
 		Models::torus.drawSolid();
 		M2 = rotate(M2, (PI / 36), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -118,15 +117,13 @@ void drawScene(GLFWwindow* window, float angle) {
 			glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M3));
 			Models::cube.drawSolid();
 		}
-
-
-		M1 = rotate(M1, PI/3, glm::vec3(0.0f, 0.0f, 1.0f));
-		M1 = glm::translate(M1, glm::vec3(2.1f, 0.0f, 0.0f));
+		M1 = glm::translate(M1, glm::vec3(1.0f, 0.0f, 0.0f));
+		M1 = rotate(M1, PI / 3, glm::vec3(0.0f, 1.0f, 0.0f));
+		M1 = glm::translate(M1, glm::vec3(1.0f, 0.0f, 0.0f));
 		direction = direction * (-1);
 	}
 	glfwSwapBuffers(window);
 }
-
 
 int main(void)
 {
