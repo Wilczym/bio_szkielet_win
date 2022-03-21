@@ -38,7 +38,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	far += yoffset;
 }
 
-float speed = 0;
+float speed = 0.0f;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -47,22 +47,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		if (key == GLFW_KEY_A)
 		{
-			speed = -3.0;
+			speed = -3.0f;
 		}
 		else if (key == GLFW_KEY_D)
 		{
-			speed = 3.0;
+			speed = 3.0f;
 		}
 	}
 	if(action == GLFW_RELEASE)
 	{
 		if (key == GLFW_KEY_A)
 		{
-			speed = 0.0;
+			speed = 0.0f;
 		}
 		else if (key == GLFW_KEY_D)
 		{
-			speed = 0.0;
+			speed = 0.0f;
 		}
 	}	
 }
@@ -97,31 +97,37 @@ void drawScene(GLFWwindow* window, float angle) {
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.f, 1.0f, 1.0f, 50.0f);
+	M = rotate(M, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 M1 = M;
 	spLambert->use();
 	glUniform4f(spLambert->u("color"), 0.9, 0.6, 0.0, 1.0);
 	glUniformMatrix4fv(spLambert->u("P"), 1, false, glm::value_ptr(P));
 	glUniformMatrix4fv(spLambert->u("V"), 1, false, glm::value_ptr(V));
-	glm::mat4 M1 = M;
-	int direction = 1;
-	for (int i = 0; i < 6; i++)
+	int direction = -1;
+	for (int i = 0; i < 4; i++)
 	{
-		glm::mat4 M2 = rotate(M1, angle * direction, glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M2));
-		Models::torus.drawSolid();
-		M2 = rotate(M2, (PI / 36), glm::vec3(0.0f, 0.0f, 1.0f));
-		for (int j = 0; j < 18; j++)
+		glm::mat4 M2 = glm::translate(M1, glm::vec3(0.0f, 0.0f, 1.0f));
+		if (i % 2 == 1)
 		{
-			glm::mat4 M3 = rotate(M2, (PI / 9) * j, glm::vec3(0.0f, 0.0f, 1.0f));
-			M3 = glm::translate(M3, glm::vec3(1.0f, 0.0f, 0.0f));
-			M3 = glm::scale(M3, glm::vec3(0.07f, 0.07f, 0.07f));
-			glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M3));
-			Models::cube.drawSolid();
+			glm::mat4 MT = M2;
+			MT = glm::translate(MT, glm::vec3(1.0f, 0.0f, 0.0f));
+			MT = glm::scale(MT, glm::vec3(0.3f, 0.3f, 0.3f));
+			MT = glm::translate(MT, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 TURNED_M = rotate(MT, PI/4 * speed, glm::vec3(0.0f, 1.0f * direction, 0.0f));
+			glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(TURNED_M));
+			Models::torus.drawWire();
+			MT = glm::translate(MT, glm::vec3(-6.67f, 0.0f, 0.0f));
+			TURNED_M = rotate(MT, PI / 4 * speed, glm::vec3(0.0f, -1.0f * direction, 0.0f));
+			glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(TURNED_M));
+			Models::torus.drawWire();
+			direction *= -1;
 		}
-		M1 = glm::translate(M1, glm::vec3(1.0f, 0.0f, 0.0f));
-		M1 = rotate(M1, PI / 3, glm::vec3(0.0f, 1.0f, 0.0f));
-		M1 = glm::translate(M1, glm::vec3(1.0f, 0.0f, 0.0f));
-		direction = direction * (-1);
+		M2 = glm::scale(M2, glm::vec3(1.0f, 0.2f, 0.2f));
+		glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M2));
+		M1 = rotate(M1, PI / 2, glm::vec3(0.0f, 1.0f, 0.0f));
+		Models::cube.drawSolid();
 	}
+	glUniformMatrix4fv(spLambert->u("M"), 1, false, glm::value_ptr(M1));
 	glfwSwapBuffers(window);
 }
 
